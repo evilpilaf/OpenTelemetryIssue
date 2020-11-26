@@ -1,0 +1,49 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+
+version: "3.4"
+
+services:
+  website1:
+    build:
+      context: .
+      dockerfile: ./src/website/Dockerfile
+    depends_on:
+      - redis
+      - otelAgent
+    environment:
+      - redis_url=redis
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - OpenTelemetryAgent=otelAgent
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  redis:
+    image: redis:alpine
+
+  otelAgent:
+    image: otel/opentelemetry-collector-contrib-dev:latest
+    command: ["--config=/etc/otel-agent-config.yaml"]
+    volumes:
+      - ./src/website/otel-agent-config.yaml:/etc/otel-agent-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888:8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "55680:55679" # zpages extension
+
+  # # Jaeger
+  # jaeger:
+  #   image: jaegertracing/all-in-one:latest
+  #   ports:
+  #     - "16686:16686"
+  #     - "14268"
+  #     - "14250"
+
+  # #Zipkin
+  # zipkin:
+  #   image: openzipkin/zipkin
+  #   container_name: zipkin
+  #   ports:
+  #     - 9411:9411
