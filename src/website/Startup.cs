@@ -24,22 +24,30 @@ namespace otel_test_1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ConnectionMultiplexer>((_) => ConnectionMultiplexer.Connect(Configuration.GetValue<string>("redis_url")));
+            services.AddSingleton<ConnectionMultiplexer>((_) => ConnectionMultiplexer.Connect(Configuration.GetValue<string>("REDIS_URL")));
 
             services.AddOpenTelemetryTracing((svc, builder) =>
             {
                 var connection = svc.GetRequiredService<ConnectionMultiplexer>();
-                builder.SetSampler(new AlwaysOnSampler())
+                builder
+                    .SetSampler(new AlwaysOnSampler())
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddGrpcClientInstrumentation()
                     .AddRedisInstrumentation(connection, options => options.FlushInterval = TimeSpan.FromSeconds(1))
-                    .AddOtlpExporter()
-                    //    .AddZipkinExporter(config =>
-                    //    {
-                    //        var zipkinHostName = Configuration.GetValue<Uri>("ZIPKIN_HOSTNAME");
-                    //        config.ServiceName = nameof(otel_test_1);
-                    //        config.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                    //    })
+                    //.AddOtlpExporter(config =>
+                    //{
+                    //    config.Endpoint = $"{this.Configuration.GetValue<string>("OPENTELEMETRYAGENT")}:55680";
+                    //    //config.
+                    //})
+                    .AddZipkinExporter(config =>
+                    {
+                        var zipkinHostName = Configuration.GetValue<Uri>("OpenTelemetryAgent");
+                        config.ServiceName = nameof(otel_test_1);
+                        config.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                    })
                     .AddConsoleExporter()
-                    .AddAspNetCoreInstrumentation();
+                    ;
             });
 
             services.AddControllersWithViews();

@@ -7,6 +7,7 @@
     <UserSecretsId>98f16595-63e2-48b9-8393-534987813425</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,8 @@
     <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.0.0-rc1.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc1.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc1.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.0.0-rc1.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
   </ItemGroup>
