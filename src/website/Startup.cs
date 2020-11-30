@@ -35,16 +35,9 @@ namespace otel_test_1
                     .AddHttpClientInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddRedisInstrumentation(connection, options => options.FlushInterval = TimeSpan.FromSeconds(1))
-                    //.AddOtlpExporter(config =>
-                    //{
-                    //    config.Endpoint = $"{this.Configuration.GetValue<string>("OPENTELEMETRYAGENT")}:55680";
-                    //    //config.
-                    //})
-                    .AddZipkinExporter(config =>
+                    .AddOtlpExporter(config =>
                     {
-                        var zipkinHostName = Configuration.GetValue<Uri>("OpenTelemetryAgent");
-                        config.ServiceName = nameof(otel_test_1);
-                        config.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                        config.Endpoint = $"{this.Configuration.GetValue<string>("OPENTELEMETRYAGENT")}:55680";
                     })
                     .AddConsoleExporter()
                     ;
